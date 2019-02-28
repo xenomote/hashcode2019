@@ -45,3 +45,5 @@ function tags (slide) {
     return tags;
 
 }
+
+module.exports = {score, compare};
