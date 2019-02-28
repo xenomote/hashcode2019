@@ -22,10 +22,57 @@ function writeFile(slides, name){
 
 
 
-let photos = readFile("a_example")
-console.log(JSON.stringify(photos))
-slide1 = {a:photos[0]}
-slide2 = {a:photos[1], b:photos[2]}
-slide3 = {a:photos[3]}
+function filterHV( photoList ) {
+    let hList = [];
+    let vList = [];
+    photoList.forEach( function ( photo, i, a ) {
+        if( photo.isV )
+            vList.push( photo )
+        else
+            hList.push( photo )
+    } );
+    return [ hList, vList ];
+}
 
-writeFile([slide1, slide2, slide3], "test.out")
+function constructHSlides( hList ) {
+    let hSlides = [];
+    hList.forEach( function ( photo, i, a ) {
+        hSlides.push( { a : photo } )
+    } );
+    return hSlides;
+}
+
+function constructVSlides( vList ) {
+    let vSlides = [];
+    for( let i = 0; i < vList.length; i += 2 ) {
+        vSlides.push( { a : vList[i], b : vList[i + 1] } )
+    }
+    return vSlides;
+}
+
+function naiveSlideshow(photos) {
+    let [ hList, vList ] = filterHV( photos )
+    return constructVSlides( vList ).concat( constructHSlides( hList ) )
+}
+
+const {score} = require("./scoring.js")
+const {generate} = require("./playingcard.js")
+
+
+function doStage(name){
+    let photos = readFile(name)
+    // console.log(photos)
+
+    // let slideshow = [slide1, slide2, slide3] 
+    console.time("Searching")
+    let slideshow = generate(naiveSlideshow(photos))
+    console.timeEnd("Searching")
+    console.log(score(slideshow))
+    writeFile(slideshow, name + ".out")
+}
+
+doStage("a_example")
+// doStage("b_lovely_landscapes")
+// doStage("c_memorable_moments")
+// doStage("d_pet_pictures")
+// doStage("e_shiny_selfies")
