@@ -1,49 +1,36 @@
 // slides :: [slide]
 // returns int
 function score (slides) {
-
     let total = 0;
-
     for (let i = 0; i < slides.length - 1; i++) total += compare(slides[i], slides[i + 1])
-
     return total;
-
 }
 
 // a :: slide 
 // b :: slide
 // returns int
 function compare (a, b) {
-
     let an = bn = abn = 0
 
-    let atags = tags(a);
-    let btags = tags(b);
+    let atags = new Set([...a.a.tags, ...(a.b ? a.b.tags : [])]);
+    let btags = new Set([...b.a.tags, ...(b.b ? b.b.tags : [])]);
 
     atags.forEach(x => {
-        if (btags.includes(x)) abn++;
-        else a++;
+        if (btags.has(x)) abn++;
+        else an++;
     });
 
     btags.forEach(y => {
-        if (!atags.includes(y)) b++;
+        if (!atags.has(y)) bn++;
     });
 
-    return min(an, bn, abn);
-
+    return Math.min(an, bn, abn);
 }
 
 // slide :: slide
 // returns [tag]
 function tags (slide) {
-
-    let tags = [];
-
-    if (slide.a) tags.concat(slide.a.tags);
-    if (slide.b) tags.concat(slide.b.tags);
-
-    return tags;
-
+    return Array.from(new Set([...slide.a.tags, ...(slide.b ? slide.b.tags : [])]));
 }
 
 module.exports = {score, compare};
