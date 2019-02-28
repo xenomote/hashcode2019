@@ -1,4 +1,4 @@
-// slides :: [slide]
+/// slides :: [slide]
 // returns int
 function score (slides) {
 
@@ -14,36 +14,33 @@ function score (slides) {
 // b :: slide
 // returns int
 function compare (a, b) {
+    console.log(a)
 
     let an = bn = abn = 0
 
     let atags = tags(a);
     let btags = tags(b);
+    console.log(atags, btags)
 
     atags.forEach(x => {
         if (btags.includes(x)) abn++;
-        else a++;
+        else an++;
     });
 
     btags.forEach(y => {
-        if (!atags.includes(y)) b++;
+        if (!atags.includes(y)) bn++;
     });
 
-    return min(an, bn, abn);
+    console.log(an, bn, abn)
+
+    return Math.min(an, bn, abn);
 
 }
 
 // slide :: slide
 // returns [tag]
 function tags (slide) {
-
-    let tags = [];
-
-    if (slide.a) tags.concat(slide.a.tags);
-    if (slide.b) tags.concat(slide.b.tags);
-
-    return tags;
-
+    return Array.from(new Set([...slide.a.tags, ...(slide.b ? slide.b.tags : [])]));
 }
 
 module.exports = {score, compare};
