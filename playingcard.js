@@ -9,7 +9,7 @@ function generate (slides) {
     output.push(slides.pop());
 
     slides.forEach(slide => {
-        let best = output;
+        let best = output.push(slide);
         let best_score = 0;
 
         for (let i = 0; i < slides.length; i++) {
