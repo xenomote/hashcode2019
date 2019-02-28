@@ -20,8 +20,6 @@ function writeFile(slides, name){
     fs.writeFileSync(name, output)
 }
 
-
-
 function filterHV( photoList ) {
     let hList = [];
     let vList = [];
@@ -55,24 +53,82 @@ function naiveSlideshow(photos) {
     return constructVSlides( vList ).concat( constructHSlides( hList ) )
 }
 
-const {score} = require("./scoring.js")
+function orderByNumberOfTags(photos){
+    return photos.sort((a, b) => {- a.tags.length + b.tags.length})
+}
+
+function countOverlap(l1, l2){
+    return l1.filter(p => l2.includes(p)).length
+}
+
+function reorderSlideshow(slidePool){
+    for (let i = 0; i < slidePool.length; i++) {
+        const curSlide = slidePool[i];
+        const targetOverlap = tags(curSlide).length * 0.4
+        const curTags = tags(curSlide)
+        for (let j = 1; j < 100; j++) {
+            const potentialMatch = slidePool[i+j];
+            if(countOverlap(curTags, tags(potentialMatch)) >= targetOverlap){
+                slidePool.splice(i, 0, potentialMatch);
+                slidePool.splice(i+j, 1);
+            }
+        }
+    }
+    return slidePool
+}
+
+const {score, tags, compare} = require("./scoring.js")
 const {generate} = require("./playingcard.js")
+
+function lina(name){
+    let photos = readFile(name)
+    let slideshow = naiveSlideshow(photos)
+    console.time("Searching")
+    for( let i = 0; i < slideshow.length - 1; ++i ) {
+        let bestI = i + 1
+        let bestC = 0
+        for( let j = i+1; j < slideshow.length; ++j ) {
+            let diff = compare( slideshow[i], slideshow[j] )
+            if( diff > bestC ) {
+                bestC = diff
+                bestI = j
+                if(bestC > 2)break
+                // if(bestC > 2)break
+            }
+        }
+        let t = slideshow[i + 1]
+        slideshow[i + 1] = slideshow[bestI]
+        slideshow[bestI] = t
+        // console.log( i )
+    }
+    console.timeEnd("Searching")
+    console.log(score(slideshow))
+    
+    writeFile(slideshow, name + "lina.out")
+}
 
 
 function doStage(name){
     let photos = readFile(name)
-    // console.log(photos)
-
-    // let slideshow = [slide1, slide2, slide3] 
     console.time("Searching")
-    let slideshow = generate(naiveSlideshow(photos))
+    let slideshow = reorderSlideshow(naiveSlideshow(orderByNumberOfTags(photos)))
     console.timeEnd("Searching")
-    console.log(score(slideshow))
+    let sc = score(slideshow)
+    console.log(sc)
     writeFile(slideshow, name + ".out")
+    return sc
 }
 
-doStage("a_example")
-// doStage("b_lovely_landscapes")
-// doStage("c_memorable_moments")
-// doStage("d_pet_pictures")
-// doStage("e_shiny_selfies")
+lina("d_pet_pictures")
+lina("e_shiny_selfies")
+
+// let ts = 0
+// console.time("Total time")
+// ts += doStage("a_example")
+// // ts += doStage("b_lovely_landscapes") // Tag pairs
+// ts += doStage("c_memorable_moments")
+// // ts += doStage("d_pet_pictures")
+// ts += doStage("e_shiny_selfies")
+// console.timeEnd("Total time")
+// console.log(`Total interest score: ${ts}`)
+
