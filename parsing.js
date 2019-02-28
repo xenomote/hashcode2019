@@ -6,8 +6,8 @@ function readFile(name){
     let numPhotos = parseInt(photos.shift())
     
     if(photos.length > numPhotos) photos.pop()
-    return photos.map(str => {
-        let photo = {}
+    return photos.map((str, i) => {
+        let photo = {id:i}
         let d = str.split(" ")
         photo.isV = d.shift() === "V"
         d.shift()
