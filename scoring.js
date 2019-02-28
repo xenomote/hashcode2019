@@ -1,29 +1,47 @@
-// photos :: [photo]
-function score (photos) {
+// slides :: [slide]
+// returns int
+function score (slides) {
 
     let total = 0;
 
-    for (let i = 0; i < photos.length - 1; i++) total += compare(photos[i], photos[i + 1])
+    for (let i = 0; i < slides.length - 1; i++) total += compare(slides[i], slides[i + 1])
 
     return total;
 
 }
 
-// a :: [tag]
-// b :: [tag]
+// a :: slide 
+// b :: slide
+// returns int
 function compare (a, b) {
 
     let an = bn = abn = 0
 
-    a.forEach(x => {
-        if (b.includes(x)) abn++;
+    let atags = tags(a);
+    let btags = tags(b);
+
+    atags.forEach(x => {
+        if (btags.includes(x)) abn++;
         else a++;
     });
 
-    b.forEach(y => {
-        if (!a.includes(y)) b++;
+    btags.forEach(y => {
+        if (!atags.includes(y)) b++;
     });
 
     return min(an, bn, abn);
+
+}
+
+// slide :: slide
+// returns [tag]
+function tags (slide) {
+
+    let tags = [];
+
+    if (slide.a) tags.concat(slide.a.tags);
+    if (slide.b) tags.concat(slide.b.tags);
+
+    return tags;
 
 }
