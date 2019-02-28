@@ -1,4 +1,4 @@
-let scoring = require('scoring.js');
+let {scoring} = require('scoring.js');
 
 // slides :: [slide] !!!CLOBBERED!!!
 // returns [slide]
@@ -15,7 +15,7 @@ function generate (slides) {
         for (let i = 0; i < slides.length; i++) {
 
             let temp = output.splice(i, 0, slide);
-            let temp_score = scoring.score(temp);
+            let temp_score = score(temp);
 
             if (score > best_score) {
                 best = temp;
